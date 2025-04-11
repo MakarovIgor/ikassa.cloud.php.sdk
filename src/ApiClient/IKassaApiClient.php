@@ -3,79 +3,60 @@
 namespace igormakarov\IKassa\ApiClient;
 
 use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 use igormakarov\IKassa\ApiClient\Routes\ShiftRoutes;
 use igormakarov\IKassa\AuthData;
-use igormakarov\IKassa\Routes\Route;
+use igormakarov\IKassa\HttpClient;
 use Throwable;
 
 class IKassaApiClient
 {
     private AuthData $authData;
-    private Client $httpClient;
+    private HttpClient $httpClient;
 
     public function __construct(AuthData $authData)
     {
         $this->authData = $authData;
-        $this->httpClient = new Client(['headers' => [
-            'Authorization' => 'Bearer ' . $authData->getToken()
-        ]]);
+        $this->httpClient = new HttpClient(
+            ['Authorization' => 'Bearer ' . $authData->getToken()],
+            function (array $result) {
+                if (!empty($result['code']) && !empty($result['message'])) {
+                    throw new Exception($result['message']);
+                }
+            }
+        );
     }
 
     /**
      * @throws Throwable
      */
-    public function getShift()
+    public function getShift(): void
     {
-        var_dump($this->sendRequest((new ShiftRoutes($this->authData))->shiftInfo()));
+        var_dump($this->httpClient->sendRequest((new ShiftRoutes($this->authData))->shiftInfo()));
     }
 
     /**
      * @throws Throwable
      */
-    public function shiftIsOpen()
+    public function shiftIsOpen(): bool
     {
-        $result = $this->sendRequest((new ShiftRoutes($this->authData))->shiftInfo());
+        $result = $this->httpClient->sendRequest((new ShiftRoutes($this->authData))->shiftInfo());
         return $result != null && $result['document'] == null;
     }
 
-
     /**
      * @throws Throwable
      */
-    public function openShift()
+    public function openShift(): void
     {
-        $this->sendRequest((new ShiftRoutes($this->authData))->openShift());
+        $this->httpClient->sendRequest((new ShiftRoutes($this->authData))->openShift());
     }
-
 
     /**
      * @throws Throwable
      */
     public function closeShift()
     {
-        $this->sendRequest((new ShiftRoutes($this->authData))->closeShift());
-    }
-
-    /**
-     * @throws Throwable
-     */
-    protected function sendRequest(Route $route): array
-    {
-        try {
-            $response = $this->httpClient->request($route->method(), $route->url(), $route->body());
-            return json_decode($response->getBody()->getContents(), true);
-        } catch (RequestException $exception) {
-            $result = json_decode($exception->getResponse()->getBody()->getContents(), true);
-
-            if (!empty($result['code']) && !empty($result['message'])) {
-                throw new Exception($result['message']);
-            }
-            return $result;
-        } catch (Throwable $exception) {
-            throw new Exception($exception->getCode(), $exception->getMessage());
-        }
+        $this->httpClient->sendRequest((new ShiftRoutes($this->authData))->closeShift());
     }
 
 }
