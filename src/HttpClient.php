@@ -13,7 +13,7 @@ class HttpClient
 {
     private Client $httpClient;
 
-    public $callBackRequesExceptionFunction;
+    private $callBackRequesExceptionFunction;
 
     public function __construct(array $headers, $callBackRequesExceptionFunction = null)
     {
