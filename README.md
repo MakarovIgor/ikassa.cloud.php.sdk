@@ -7,6 +7,14 @@
 Описание облачной кассы: https://ikassa.by/box-solutions/dusik_cloud </br>
 API: https://ikassa.pages.imlab.by/cloud-cashbox/doc/auth.html</br></br>
 
+### Подключение к проекту:
+```cli
+composer require igormakarov/ikassa.cloud.php.sdk
+```
+```php
+require_once 'vendor/autoload.php';
+```
+
 ### Работа с Авторизацией(получение device_code, получение прав для работы с API):
 
 Для работы с авторизаций с iKassa потребуется класс Auth:
