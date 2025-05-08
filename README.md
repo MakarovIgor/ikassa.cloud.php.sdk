@@ -35,10 +35,10 @@ $bindData = $auth->bindingData("_os", "_osVer", '_deviceName', '_appName');
 при успешно выполнении в $bindData запишет объект BindingData, котором хранится и можно будет получить user_code для привязки кассы в ЛК iKassa 
 и device_code для дальнейшего получения токена авторизации 
 
-Пример получения user_token и device_code из BindingData
+Пример получения user_code и device_code из BindingData
 ```php 
-$deviceCode = $bindData->getDeviceCode();
-$userCode = $bindData->getUserCode();
+$deviceCode = $bindData->getDeviceCode(); // метод получения device_code
+$userCode = $bindData->getUserCode(); // метод получения user_code
 $expireIn = $bindData->getExpiresIn(); // метод получения скрока действия user_code для привязки кассы в ЛК 
 ```
 
