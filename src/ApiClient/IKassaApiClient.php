@@ -3,6 +3,12 @@
 namespace igormakarov\IKassa\ApiClient;
 
 use Exception;
+use igormakarov\IKassa\ApiClient\Models\Currencies;
+use igormakarov\IKassa\ApiClient\Models\FiscalDocumentData;
+use igormakarov\IKassa\ApiClient\Models\Receipt;
+use igormakarov\IKassa\ApiClient\Models\RefundReceipt;
+use igormakarov\IKassa\ApiClient\Models\RollbackFiscalDocumentData;
+use igormakarov\IKassa\ApiClient\Routes\FiscalOperationsRoutes;
 use igormakarov\IKassa\ApiClient\Routes\ShiftRoutes;
 use igormakarov\IKassa\AuthData;
 use igormakarov\IKassa\HttpClient;
@@ -17,7 +23,8 @@ class IKassaApiClient
     {
         $this->authData = $authData;
         $this->httpClient = new HttpClient(
-            ['Authorization' => 'Bearer ' . $authData->getToken()],
+            ['Authorization' => 'Bearer ' . $authData->getToken(),
+                'Content-Type' => 'application/json'],
             function (array $result) {
                 if (!empty($result['code']) && !empty($result['message'])) {
                     throw new Exception($result['message']);
@@ -29,9 +36,9 @@ class IKassaApiClient
     /**
      * @throws Throwable
      */
-    public function getShift(): void
+    public function getShift(): array
     {
-        var_dump($this->httpClient->sendRequest((new ShiftRoutes($this->authData))->shiftInfo()));
+        return $this->httpClient->sendRequest((new ShiftRoutes($this->authData))->shiftInfo());
     }
 
     /**
@@ -57,6 +64,71 @@ class IKassaApiClient
     public function closeShift()
     {
         $this->httpClient->sendRequest((new ShiftRoutes($this->authData))->closeShift());
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function deposit(FiscalDocumentData $fiscalDocumentData)
+    {
+        $this->httpClient->sendRequest((new FiscalOperationsRoutes($this->authData))->deposit($fiscalDocumentData));
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function withdraw(FiscalDocumentData $fiscalDocumentData)
+    {
+        $this->httpClient->sendRequest((new FiscalOperationsRoutes($this->authData))->withdraw($fiscalDocumentData));
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function cHWithdraw(FiscalDocumentData $fiscalDocumentData)
+    {
+        $this->httpClient->sendRequest((new FiscalOperationsRoutes($this->authData))->cHWithdraw($fiscalDocumentData));
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function getCashSumInCashBox(string $currency): int
+    {
+        if (!in_array($currency, Currencies::toArray())) {
+            throw new Exception("wrong currency, see Currencies::class");
+        }
+        $shift = $this->getShift();
+        return isset($shift["counters"][$currency]) ? $shift["counters"][$currency]["attributes"]["$.cashin.sum"] : 0;
+    }
+
+
+    /**
+     * @throws Throwable
+     */
+    public function sale(Receipt $receipt)
+    {
+        var_dump($this->httpClient->sendRequest((new FiscalOperationsRoutes($this->authData))->sale($receipt)));
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function rollback(RollbackFiscalDocumentData $rollbackFiscalDocumentData)
+    {
+        var_dump($this->httpClient->sendRequest(
+            (new FiscalOperationsRoutes($this->authData))->rollback($rollbackFiscalDocumentData)
+        ));
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function refund(RefundReceipt $receipt)
+    {
+        var_dump($this->httpClient->sendRequest(
+            (new FiscalOperationsRoutes($this->authData))->refund($receipt)
+        ));
     }
 
 }

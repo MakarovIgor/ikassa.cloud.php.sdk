@@ -16,17 +16,17 @@ class ShiftRoutes
         $this->url = $authData->getUrl() . '/api/workstations.shift';
     }
 
-    public function shiftInfo()
+    public function shiftInfo(): Route
     {
         return new Route($this->url);
     }
 
-    public function openShift()
+    public function openShift(): Route
     {
         return new Route($this->url . '.open', "POST");
     }
 
-    public function closeShift()
+    public function closeShift(): Route
     {
         return new Route($this->url . '.close', "POST");
     }

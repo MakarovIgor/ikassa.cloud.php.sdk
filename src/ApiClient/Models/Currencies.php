@@ -3,17 +3,23 @@
 namespace igormakarov\IKassa\ApiClient\Models;
 
 use Exception;
+use http\Exception\InvalidArgumentException;
 
 class Currencies
 {
-    public static string $BYN = 'BYN';
-    public static string $USD = 'USD';
-    public static string $EUR = 'EUR';
-    public static string $RUB = 'RUB';
+    public const BYN = 'BYN';
+    public const USD = 'USD';
+    public const EUR = 'EUR';
+    public const RUB = 'RUB';
 
     public static function toArray(): array
     {
-        return [self::$BYN, self::$USD, self::$EUR, self::$RUB];
+        return [
+            Currencies::BYN,
+            Currencies::USD,
+            Currencies::EUR,
+            Currencies::RUB
+        ];
     }
 
     /**
@@ -22,7 +28,7 @@ class Currencies
     public static function validate(string $type): void
     {
         if (!in_array($type, self::toArray(), true)) {
-            throw new Exception('wrong currency');
+            throw new InvalidArgumentException('wrong currency');
         }
     }
 }
