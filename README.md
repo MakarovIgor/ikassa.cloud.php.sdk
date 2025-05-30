@@ -61,3 +61,28 @@ $newAccessTokenData = $auth->refreshAccessTokenData('<your_refresh_token>') //yo
 
 > refreshAccessTokenData - получает тот же объект AccessTokenData что и getAccessTokenData
 
+
+### Основные методы для работы с API 
+
+Для работы с API iKassa потребуется класс IKassaApiClient:
+```php
+
+$kassaApi = new IKassaApiClient(
+    new AuthData(
+        'https://api.cloud.stage.imlab.by',
+        'access_token'
+    )
+);
+```
+> access_token - токен полученый из методов getAccessTokenData или refreshAccessTokenData
+
+В случае успеха, в $kassaApi запишется класс, для дальнейшей работы с API.
+
+```php
+$kassaApi->getShift(); // возвращает данные о текущей смене
+$kassaApi->shiftIsOpen(); // проверяет, открыта ли смена в данный момент
+$kassaApi->openShift(); // открытие смены
+$kassaApi->closeShift(); // закрытие смены. Перед закрытием смены, касса обязательно должна быть обнулена. 
+$kassaApi->getCashSumInCashBox('string $currency'); // проверка наличных средств в кассе
+```
+> $currency - валюта, использующаяся в кассе. Например, BYN или USD. Типы валют можно узнать в Currencies::class
