@@ -6,9 +6,8 @@ use igormakarov\IKassa\Auth\Models\AccessTokenData;
 
 class AccessTokenDataMapper
 {
-    public static function newInstance(array $bindingData)
+    public static function newInstance(array $bindingData): AccessTokenData
     {
-        var_dump($bindingData);exit;
         return new AccessTokenData(
             $bindingData['access_token'],
             $bindingData['expires_in'],
