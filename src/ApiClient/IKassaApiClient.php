@@ -36,6 +36,15 @@ class IKassaApiClient
     /**
      * @throws Throwable
      */
+    public function isConnected(): bool
+    {
+        $result = $this->httpClient->sendRequest((new ShiftRoutes($this->authData))->isConnected());
+        return $result['hasDevice'] === true;
+    }
+
+    /**
+     * @throws Throwable
+     */
     public function getShift(): array
     {
         return $this->httpClient->sendRequest((new ShiftRoutes($this->authData))->shiftInfo());

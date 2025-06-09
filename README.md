@@ -79,6 +79,7 @@ $kassaApi = new IKassaApiClient(
 В случае успеха, в $kassaApi запишется класс, для дальнейшей работы с API.
 
 ```php
+$kassaApi->isConnected(); // проверяет, привязана ли касса в личном кабинете iKassa.
 $kassaApi->getShift(); // возвращает данные о текущей смене
 $kassaApi->shiftIsOpen(); // проверяет, открыта ли смена в данный момент
 $kassaApi->openShift(); // открытие смены
