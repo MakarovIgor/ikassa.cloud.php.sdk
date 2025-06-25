@@ -2,7 +2,6 @@
 
 namespace igormakarov\IKassa\ApiClient;
 
-use Exception;
 use igormakarov\IKassa\ApiClient\Models\Currencies;
 use igormakarov\IKassa\ApiClient\Models\FiscalDocumentData;
 use igormakarov\IKassa\ApiClient\Models\Receipt;
@@ -13,6 +12,7 @@ use igormakarov\IKassa\ApiClient\Routes\ShiftRoutes;
 use igormakarov\IKassa\AuthData;
 use igormakarov\IKassa\HttpClient;
 use Throwable;
+use Exception;
 
 class IKassaApiClient
 {
@@ -70,7 +70,7 @@ class IKassaApiClient
     /**
      * @throws Throwable
      */
-    public function closeShift()
+    public function closeShift(): void
     {
         $this->httpClient->sendRequest((new ShiftRoutes($this->authData))->closeShift());
     }
@@ -78,7 +78,7 @@ class IKassaApiClient
     /**
      * @throws Throwable
      */
-    public function deposit(FiscalDocumentData $fiscalDocumentData)
+    public function deposit(FiscalDocumentData $fiscalDocumentData): void
     {
         $this->httpClient->sendRequest((new FiscalOperationsRoutes($this->authData))->deposit($fiscalDocumentData));
     }
@@ -86,7 +86,7 @@ class IKassaApiClient
     /**
      * @throws Throwable
      */
-    public function withdraw(FiscalDocumentData $fiscalDocumentData)
+    public function withdraw(FiscalDocumentData $fiscalDocumentData): void
     {
         $this->httpClient->sendRequest((new FiscalOperationsRoutes($this->authData))->withdraw($fiscalDocumentData));
     }
@@ -94,7 +94,7 @@ class IKassaApiClient
     /**
      * @throws Throwable
      */
-    public function cHWithdraw(FiscalDocumentData $fiscalDocumentData)
+    public function cHWithdraw(FiscalDocumentData $fiscalDocumentData): void
     {
         $this->httpClient->sendRequest((new FiscalOperationsRoutes($this->authData))->cHWithdraw($fiscalDocumentData));
     }
@@ -115,9 +115,9 @@ class IKassaApiClient
     /**
      * @throws Throwable
      */
-    public function sale(Receipt $receipt)
+    public function sale(Receipt $receipt): array
     {
-        var_dump($this->httpClient->sendRequest((new FiscalOperationsRoutes($this->authData))->sale($receipt)));
+        return $this->httpClient->sendRequest((new FiscalOperationsRoutes($this->authData))->sale($receipt));
     }
 
     /**
@@ -125,9 +125,9 @@ class IKassaApiClient
      */
     public function rollback(RollbackFiscalDocumentData $rollbackFiscalDocumentData)
     {
-        var_dump($this->httpClient->sendRequest(
+        $this->httpClient->sendRequest(
             (new FiscalOperationsRoutes($this->authData))->rollback($rollbackFiscalDocumentData)
-        ));
+        );
     }
 
     /**
@@ -135,9 +135,8 @@ class IKassaApiClient
      */
     public function refund(RefundReceipt $receipt)
     {
-        var_dump($this->httpClient->sendRequest(
+        $this->httpClient->sendRequest(
             (new FiscalOperationsRoutes($this->authData))->refund($receipt)
-        ));
+        );
     }
-
 }
