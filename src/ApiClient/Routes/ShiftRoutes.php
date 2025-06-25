@@ -35,4 +35,9 @@ class ShiftRoutes
     {
         return new Route($this->url . '.shift.close', "POST");
     }
+
+    public function getFiscalDocumentByUid(string $uid): Route
+    {
+        return new Route($this->url . '.docs.get?uid=' . $uid);
+    }
 }

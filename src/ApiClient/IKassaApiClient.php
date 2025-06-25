@@ -2,6 +2,7 @@
 
 namespace igormakarov\IKassa\ApiClient;
 
+use GuzzleHttp\Exception\GuzzleException;
 use igormakarov\IKassa\ApiClient\Models\Currencies;
 use igormakarov\IKassa\ApiClient\Models\FiscalDocumentData;
 use igormakarov\IKassa\ApiClient\Models\Receipt;
@@ -137,6 +138,16 @@ class IKassaApiClient
     {
         $this->httpClient->sendRequest(
             (new FiscalOperationsRoutes($this->authData))->refund($receipt)
+        );
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function getFiscalDocumentByUid(string $uid): array
+    {
+        return $this->httpClient->sendRequest(
+            (new ShiftRoutes($this->authData))->getFiscalDocumentByUid($uid)
         );
     }
 }
