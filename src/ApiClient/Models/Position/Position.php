@@ -21,6 +21,7 @@ class Position
 
     private string $thirdPartyUNP;
 
+    private array $code = [];
 
 
     public function __construct(string $name, int $price, int $quantity)
@@ -56,6 +57,20 @@ class Position
     public function setThirdPartyUNP(string $thirdPartyUNP)
     {
         $this->thirdPartyUNP = $thirdPartyUNP;
+    }
+
+    public function toService(int $code = 0)
+    {
+        $this->code['code'] = [
+            'service' => $code
+        ];
+    }
+
+    public function toPrepayment(int $code = 0)
+    {
+        $this->code['code'] = [
+            'prepayment' => $code
+        ];
     }
 
     public function toArray(): array

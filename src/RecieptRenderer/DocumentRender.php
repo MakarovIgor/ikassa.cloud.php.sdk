@@ -5,7 +5,7 @@ namespace igormakarov\IKassa\RecieptRenderer;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
-class FiscalDocumentRender
+class DocumentRender
 {
     private string $url;
     private Client $httpClient;

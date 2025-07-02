@@ -38,6 +38,17 @@ class PositionBuilder
         return $this;
     }
 
+    public function toService($code = 0): PositionBuilder
+    {
+        $this->position->toService($code);
+        return $this;
+    }
+    public function toPrepayment($code = 0): PositionBuilder
+    {
+        $this->position->toPrepayment($code);
+        return $this;
+    }
+
     public function build(): Position
     {
         return $this->position;

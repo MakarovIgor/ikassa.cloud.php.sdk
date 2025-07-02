@@ -14,7 +14,7 @@ class Receipt
     private Modifiers $modifiers;
     private Payments $payments;
 
-    public function __construct(Header $header, Positions $positions, Payments $payments, Modifiers $modifiers)
+    public function __construct(Header $header, Positions $positions, Payments $payments, Modifiers $modifiers = null)
     {
         $this->header = $header;
         $this->positions = $positions;
