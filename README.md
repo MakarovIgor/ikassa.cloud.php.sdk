@@ -61,3 +61,89 @@ $newAccessTokenData = $auth->refreshAccessTokenData('<your_refresh_token>') //yo
 
 > refreshAccessTokenData - получает тот же объект AccessTokenData что и getAccessTokenData
 
+
+### Основные методы для работы с API 
+
+Для работы с API iKassa потребуется класс IKassaApiClient:
+```php
+
+$kassaApi = new IKassaApiClient(
+    new AuthData(
+        'https://api.cloud.stage.imlab.by',
+        'access_token'
+    )
+);
+```
+> access_token - токен полученый из методов getAccessTokenData или refreshAccessTokenData
+
+В случае успеха, в $kassaApi запишется класс, для дальнейшей работы с API.
+
+```php
+$kassaApi->isConnected(); // проверяет, привязана ли касса в личном кабинете iKassa.
+$kassaApi->getShift(); // возвращает данные о текущей смене
+$kassaApi->shiftIsOpen(); // проверяет, открыта ли смена в данный момент
+$kassaApi->openShift(); // открытие смены
+$kassaApi->closeShift(); // закрытие смены. Перед закрытием смены, из кассы обязательно должна быть изьяты все наличные.
+$kassaApi->getCashSumInCashBox(string $currency); // проверка наличных средств в кассе
+```
+> $currency - валюта, использующаяся в кассе(BYN, USD, EUR или RUB). Типы валют которые используются можно узнать в Currencies::class
+
+Изьятие денег из кассы.
+
+```php
+$header = new Header(
+        string $cashierName,
+        string $currency
+    );
+
+$fiscalDocumentData = new FiscalDocumentData(IHeader $header, int $sum);    
+
+$kassaApi->withdraw(FiscalDocumentData $fiscalDocumentData); // Изьятие. Обязательно нужно выполнят перед закрытием смены, если есть наличка в кассе.
+```
+
+Продажа товара.
+
+```php
+$positions = [];
+
+$position1 = new PositionBuilder(
+    string $goodTitle,
+    int $cost     // Цена за 1 ед. тов. позиции в копейках
+    int $quantity // Кол-во тов. позиции. Передается минимальное значение с учетом 3х знаков после запятой. Например: 1.000 (1 штука) = 1000. 1.234 (1 кг 234 г) = 1234.
+);
+
+$position1->setTax(int $tax); // НДС товара. Доступны значения - 0, 10, 20, 25
+$position1->setSection(Section $section); // Секция товара. Опциональное поле. Принимает обьект Section(int $code, string $name)
+$positions[] = $position1->build();  
+
+$items = new Positions($positions);
+
+$paymentsArr = [];
+$paymentsArr[] = new Payment(int $type, int sum); // $type - тип оплаты. 0 - Безнал, 1 - Наличные. 2 - др. способы. 
+
+$payments = new Payments($paymentsArr); // //Кол-во оплат наличными не может быть больше 1 штуки
+
+$modifier = new Modifier(int $sum, string $name = "", string $group = "") // Модификаторы цены (скидки/надбавки). Опциональное поле. 
+
+//$sum
+//Скидка: отрицательное значение.
+//Надбавка: положительное значение.
+//Значение по модулю не может превышать 54975581388799
+
+//$name
+//Наименование Скидки/Надбавки для отображения
+
+//$group
+//Идентификатор для группировки и получения статистической информации из внешнего ПО: бух. учет, ТУ и др.
+
+$modifiers = new Modifiers(array $modifiers); // Может быть передана только 1 скидка и 1 надбавка.
+
+$receipt = new Receipt(
+    $header,
+    $items,
+    $payments,
+    $modifiers
+);
+
+$kassaApi->sale(Receipt $receipt); // Продажа
+```

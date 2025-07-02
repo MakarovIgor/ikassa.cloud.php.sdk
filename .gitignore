@@ -4,3 +4,4 @@ composer.phar
 test.php
 .idea/
 composer.lock
+.d

@@ -3,7 +3,6 @@
 namespace igormakarov\IKassa\ApiClient\Models;
 
 use igormakarov\IKassa\ApiClient\Models\Header\Header;
-use igormakarov\IKassa\ApiClient\Models\Header\IHeader;
 use igormakarov\IKassa\ApiClient\Models\Modifier\Modifiers;
 use igormakarov\IKassa\ApiClient\Models\Payment\Payments;
 use igormakarov\IKassa\ApiClient\Models\Position\Positions;
@@ -34,7 +33,6 @@ class Receipt
             $result['modifiers'] = $this->modifiers->toArray();
         }
 
-        var_dump(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         return json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 }

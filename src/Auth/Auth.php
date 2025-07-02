@@ -2,7 +2,7 @@
 
 namespace igormakarov\IKassa\Auth;
 
-use Exception;
+use igormakarov\IKassa\ApiClient\Exceptions\Auth\AuthExceptionFactory;
 use igormakarov\IKassa\Auth\Mappers\AccessTokenDataMapper;
 use igormakarov\IKassa\Auth\Mappers\BindingDataMapper;
 use igormakarov\IKassa\Auth\Models\AccessTokenData;
@@ -27,7 +27,7 @@ class Auth
             ['Content-Type' => 'application/x-www-form-urlencoded'],
             function (array $result) {
                 if (!empty($result['error'])) {
-                    throw new Exception($result['error_description']);
+                    AuthExceptionFactory::newInstance($result['error'], $result['error_description']);
                 }
             }
         );
