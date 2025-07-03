@@ -79,25 +79,34 @@ class IKassaApiClient
     /**
      * @throws Throwable
      */
-    public function deposit(FiscalDocumentData $fiscalDocumentData): void
+    public function deposit(FiscalDocumentData $fiscalDocumentData): string
     {
-        $this->httpClient->sendRequest((new FiscalOperationsRoutes($this->authData))->deposit($fiscalDocumentData));
+        $response = $this->httpClient->sendRequest(
+            (new FiscalOperationsRoutes($this->authData))->deposit($fiscalDocumentData)
+        );
+        return $response["uid"];
     }
 
     /**
      * @throws Throwable
      */
-    public function withdraw(FiscalDocumentData $fiscalDocumentData): void
+    public function withdraw(FiscalDocumentData $fiscalDocumentData): string
     {
-        $this->httpClient->sendRequest((new FiscalOperationsRoutes($this->authData))->withdraw($fiscalDocumentData));
+        $response = $this->httpClient->sendRequest(
+            (new FiscalOperationsRoutes($this->authData))->withdraw($fiscalDocumentData)
+        );
+        return $response["uid"];
     }
 
     /**
      * @throws Throwable
      */
-    public function cHWithdraw(FiscalDocumentData $fiscalDocumentData): void
+    public function cHWithdraw(FiscalDocumentData $fiscalDocumentData): string
     {
-        $this->httpClient->sendRequest((new FiscalOperationsRoutes($this->authData))->cHWithdraw($fiscalDocumentData));
+        $response = $this->httpClient->sendRequest(
+            (new FiscalOperationsRoutes($this->authData))->cHWithdraw($fiscalDocumentData)
+        );
+        return $response["uid"];
     }
 
     /**
@@ -116,29 +125,31 @@ class IKassaApiClient
     /**
      * @throws Throwable
      */
-    public function sale(Receipt $receipt): array
+    public function sale(Receipt $receipt): string
     {
-        return $this->httpClient->sendRequest((new FiscalOperationsRoutes($this->authData))->sale($receipt));
+        return $this->httpClient->sendRequest((new FiscalOperationsRoutes($this->authData))->sale($receipt))["uid"];
     }
 
     /**
      * @throws Throwable
      */
-    public function rollback(RollbackFiscalDocumentData $rollbackFiscalDocumentData)
+    public function rollback(RollbackFiscalDocumentData $rollbackFiscalDocumentData): string
     {
-        $this->httpClient->sendRequest(
+        $response = $this->httpClient->sendRequest(
             (new FiscalOperationsRoutes($this->authData))->rollback($rollbackFiscalDocumentData)
         );
+        return $response["uid"];
     }
 
     /**
      * @throws Throwable
      */
-    public function refund(RefundReceipt $receipt)
+    public function refund(RefundReceipt $receipt): string
     {
-        $this->httpClient->sendRequest(
+        $response = $this->httpClient->sendRequest(
             (new FiscalOperationsRoutes($this->authData))->refund($receipt)
         );
+        return $response["uid"];
     }
 
     /**

@@ -28,7 +28,6 @@ class RefundReceipt
             'payments' => $this->payments->toArray(),
         ];
 
-        var_dump(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         return json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 }

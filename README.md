@@ -74,7 +74,7 @@ $kassaApi = new IKassaApiClient(
     )
 );
 ```
-> access_token - токен полученый из методов getAccessTokenData или refreshAccessTokenData
+> access_token - токен полученный из методов getAccessTokenData или refreshAccessTokenData
 
 В случае успеха, в $kassaApi запишется класс, для дальнейшей работы с API.
 
@@ -87,19 +87,6 @@ $kassaApi->closeShift(); // закрытие смены. Перед закрыт
 $kassaApi->getCashSumInCashBox(string $currency); // проверка наличных средств в кассе
 ```
 > $currency - валюта, использующаяся в кассе(BYN, USD, EUR или RUB). Типы валют которые используются можно узнать в Currencies::class
-
-Изьятие денег из кассы.
-
-```php
-$header = new Header(
-        string $cashierName,
-        string $currency
-    );
-
-$fiscalDocumentData = new FiscalDocumentData(IHeader $header, int $sum);    
-
-$kassaApi->withdraw(FiscalDocumentData $fiscalDocumentData); // Изьятие. Обязательно нужно выполнят перед закрытием смены, если есть наличка в кассе.
-```
 
 Простая продажа товара.
 
@@ -119,7 +106,7 @@ $iKassaClient->sale(
                 new Payment(PaymentTypes::CASH, 200), //Тип оплаты "наличка" - CASH, "безнал" - CARD, иные способы расчета "ОTHER" 
             ])
         )
-    );
+    ); // возвращает УИ - уникальный идентификатор документа
 
 ```
 Более сложная продажа со скидками
@@ -131,24 +118,66 @@ $iKassaClient->sale(
                  (new PositionBuilder('test good', 200, 1000))
                      ->setSection(new Section(1, 'отдел 1'))
                      ->setTax(TaxTypes::TAX_10)
+                     ->setDiscount(new Discount(100, "ночная скидка на товар")) //Скидка на товар
                      ->toService() // как услуга
                      ->build(),
                  (new PositionBuilder('test good 2', 100, 1000))
                      ->setSection(new Section(1, 'отдел 1'))
                      ->setTax(TaxTypes::TAX_10)
+                     ->setMarkup(new Markup(100, "надбавка просто так на товар")) // Надбавка на товар
                      ->build()
              ]),
-             new Payments([ //Типы оплат
-                 new Payment(PaymentTypes::CASH, 100), //наличка
-                 new Payment(PaymentTypes::CARD, 100), //безнал(карта)
+             new Payments([
+                 new Payment(PaymentTypes::CASH, 100),
+                 new Payment(PaymentTypes::CARD, 100),
              ]),
-             new Modifiers([ //Модификаторы: скидки/надбавки на весь чек
-                 new Discount(100, "скидка на весь чек") //скидка
+             new Modifiers([
+                 new Discount(100, "скидка на весь чек")
              ])
          )
-     );
-
+     ); // возвращает УИ - уникальный идентификатор документа
 ```
+
+Возврат 
+```php
+$iKassaClient->refund(
+        new RefundReceipt(
+            new Header("ФИО кассира", Currencies::BYN),
+            new Positions([
+                (new PositionBuilder('test good', 100, 1000))
+                    ->setSection(new Section(1, 'отдел 1'))
+                    ->setTax(TaxTypes::TAX_10)
+                     ->setDiscount(new Discount(100, "ночная скидка"))
+                    ->build(),
+                new Position('test good 22', 100, 1000)
+            ]),
+            new Payments([
+                new Payment(PaymentTypes::CASH, 20),
+                new Payment(PaymentTypes::CARD, 80),
+            ])
+        )
+    ); // возвращает УИ - уникальный идентификатор документа
+```
+
+Внесение и изъятие и выдача денег 
+```php
+
+// Внесение
+$iKassaClient->deposit(new FiscalDocumentData(new Header("ФИО Кассира", Currencies::BYN), 100));
+// Изъятие. Обязательно нужно выполнять для каждой валюты перед закрытием смены, если есть наличка в кассе.
+$iKassaClient->withdraw(new FiscalDocumentData(new Header("ФИО Кассира", Currencies::BYN), 100));
+// Выдача
+$iKassaClient->cHWithdraw(new FiscalDocumentData(new Header("MyName", Currencies::$BYN), 10));
+
+// Все методы возвращают УИ - уникальный идентификатор документа
+```
+Аннулирование последнего документа
+```php
+$iKassaClient->rollback(new RollbackFiscalDocumentData(new RollbackHeader("ФИО кассира"), 61)); //61 - номер последнего документа
+// возвращает УИ - уникальный идентификатор документа
+```
+
+
 Как получить чек в HTML-формате по его УИ
 ```php
 //адреса для получения чека в html формате
@@ -161,4 +190,8 @@ var_dump((new DocumentRender(
 
 ```
 
-
+Дополнительные функции
+```php
+//Получить сумму наличных в кассе определенной валюты
+$sum = $iKassaClient->getCashSumInCashBox(Currencies::BYN);
+```
