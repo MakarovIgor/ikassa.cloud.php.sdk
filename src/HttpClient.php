@@ -13,13 +13,13 @@ class HttpClient
 {
     private Client $httpClient;
 
-    private $callBackRequesExceptionFunction;
+    private $callBackRequestExceptionFunction;
 
-    public function __construct(array $headers, $callBackRequesExceptionFunction = null)
+    public function __construct(array $headers, $callBackRequestExceptionFunction = null)
     {
         $config = (!empty($headers)) ? ['headers' => $headers] : [];
         $this->httpClient = new Client($config);
-        $this->callBackRequesExceptionFunction = $callBackRequesExceptionFunction;
+        $this->callBackRequestExceptionFunction = $callBackRequestExceptionFunction;
     }
 
     /**
@@ -34,8 +34,8 @@ class HttpClient
         } catch (RequestException $exception) {
             $result = json_decode($exception->getResponse()->getBody()->getContents(), true);
 
-            if (is_callable($this->callBackRequesExceptionFunction)) {
-                $callBack = $this->callBackRequesExceptionFunction;
+            if (is_callable($this->callBackRequestExceptionFunction)) {
+                $callBack = $this->callBackRequestExceptionFunction;
                 $callBack($result);
             }
 

@@ -101,49 +101,64 @@ $fiscalDocumentData = new FiscalDocumentData(IHeader $header, int $sum);
 $kassaApi->withdraw(FiscalDocumentData $fiscalDocumentData); // Изьятие. Обязательно нужно выполнят перед закрытием смены, если есть наличка в кассе.
 ```
 
-Продажа товара.
+Простая продажа товара.
 
 ```php
-$positions = [];
+// Кол-во тов. позиции. Передается минимальное значение с учетом 3х знаков после запятой. Например: 1.000 (1 штука) = 1000. 1.234 (1 кг 234 г) = 1234
 
-$position1 = new PositionBuilder(
-    string $goodTitle,
-    int $cost     // Цена за 1 ед. тов. позиции в копейках
-    int $quantity // Кол-во тов. позиции. Передается минимальное значение с учетом 3х знаков после запятой. Например: 1.000 (1 штука) = 1000. 1.234 (1 кг 234 г) = 1234.
-);
+$iKassaClient->sale(
+        new Receipt(
+            new Header("ФИО кассира", Currencies::BYN), //ФИО кассира и валюта
+            new Positions([ //Товары
+                (new PositionBuilder('test good', 200, 1000)) //Название товара, стоимость, количество
+                    ->setSection(new Section(1, 'отдел 1')) //Номер и название отдела
+                    ->setTax(TaxTypes::TAX_10) //HДС 10%, Доступны значения - 0, 10, 20, 25
+                    ->build()
+            ]),
+            new Payments([ //Оплаты
+                new Payment(PaymentTypes::CASH, 200), //Тип оплаты "наличка" - CASH, "безнал" - CARD, иные способы расчета "ОTHER" 
+            ])
+        )
+    );
 
-$position1->setTax(int $tax); // НДС товара. Доступны значения - 0, 10, 20, 25
-$position1->setSection(Section $section); // Секция товара. Опциональное поле. Принимает обьект Section(int $code, string $name)
-$positions[] = $position1->build();  
-
-$items = new Positions($positions);
-
-$paymentsArr = [];
-$paymentsArr[] = new Payment(int $type, int sum); // $type - тип оплаты. 0 - Безнал, 1 - Наличные. 2 - др. способы. 
-
-$payments = new Payments($paymentsArr); // //Кол-во оплат наличными не может быть больше 1 штуки
-
-$modifier = new Modifier(int $sum, string $name = "", string $group = "") // Модификаторы цены (скидки/надбавки). Опциональное поле. 
-
-//$sum
-//Скидка: отрицательное значение.
-//Надбавка: положительное значение.
-//Значение по модулю не может превышать 54975581388799
-
-//$name
-//Наименование Скидки/Надбавки для отображения
-
-//$group
-//Идентификатор для группировки и получения статистической информации из внешнего ПО: бух. учет, ТУ и др.
-
-$modifiers = new Modifiers(array $modifiers); // Может быть передана только 1 скидка и 1 надбавка.
-
-$receipt = new Receipt(
-    $header,
-    $items,
-    $payments,
-    $modifiers
-);
-
-$kassaApi->sale(Receipt $receipt); // Продажа
 ```
+Более сложная продажа со скидками
+```php
+$iKassaClient->sale(
+         new Receipt(
+             new Header("ФИО кассира", Currencies::BYN),
+             new Positions([
+                 (new PositionBuilder('test good', 200, 1000))
+                     ->setSection(new Section(1, 'отдел 1'))
+                     ->setTax(TaxTypes::TAX_10)
+                     ->toService() // как услуга
+                     ->build(),
+                 (new PositionBuilder('test good 2', 100, 1000))
+                     ->setSection(new Section(1, 'отдел 1'))
+                     ->setTax(TaxTypes::TAX_10)
+                     ->build()
+             ]),
+             new Payments([ //Типы оплат
+                 new Payment(PaymentTypes::CASH, 100), //наличка
+                 new Payment(PaymentTypes::CARD, 100), //безнал(карта)
+             ]),
+             new Modifiers([ //Модификаторы: скидки/надбавки на весь чек
+                 new Discount(100, "скидка на весь чек") //скидка
+             ])
+         )
+     );
+
+```
+Как получить чек в HTML-формате по его УИ
+```php
+//адреса для получения чека в html формате
+//https://receipts.cloud.ikassa.by/ - для прода 
+//https://receipts.cloud.stage.imlab.by/ - для стейджа
+
+var_dump((new DocumentRender(
+    "https://receipts.cloud.stage.imlab.by/"
+))->render('813D867242EC1704071834F3'));
+
+```
+
+

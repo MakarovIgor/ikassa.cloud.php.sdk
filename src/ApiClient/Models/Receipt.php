@@ -11,7 +11,7 @@ class Receipt
 {
     private Header $header;
     private Positions $positions;
-    private Modifiers $modifiers;
+    private ?Modifiers $modifiers;
     private Payments $payments;
 
     public function __construct(Header $header, Positions $positions, Payments $payments, Modifiers $modifiers = null)
@@ -29,7 +29,8 @@ class Receipt
             'items' => $this->positions->toArray(),
             'payments' => $this->payments->toArray(),
         ];
-        if (!empty($this->modifiers->toArray())) {
+
+        if (!empty($this->modifiers) && !empty($this->modifiers->toArray())) {
             $result['modifiers'] = $this->modifiers->toArray();
         }
 
