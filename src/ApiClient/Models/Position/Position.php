@@ -81,7 +81,7 @@ class Position
             'quantity' => $this->quantity,
         ];
 
-        if (!empty($this->tax)) {
+        if ((int)$this->tax >= 0) {
             $array['tax'] = $this->tax;
         }
 

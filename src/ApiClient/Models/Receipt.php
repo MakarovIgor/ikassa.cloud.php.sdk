@@ -22,6 +22,16 @@ class Receipt
         $this->modifiers = $modifiers;
     }
 
+    public function getPositions(): Positions
+    {
+        return $this->positions;
+    }
+
+    public function getPayments(): Payments
+    {
+        return $this->payments;
+    }
+
     public function toJson(): string
     {
         $result = [
