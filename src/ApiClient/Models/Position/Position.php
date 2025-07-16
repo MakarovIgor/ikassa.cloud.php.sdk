@@ -15,7 +15,7 @@ class Position
     private ?Discount $discount = null;
     private ?Markup $markup = null;
 
-    protected string $tax = "";
+    protected ?string $tax = null;
 
     private ?Section $section = null;
 
@@ -81,7 +81,7 @@ class Position
             'quantity' => $this->quantity,
         ];
 
-        if ((int)$this->tax >= 0) {
+        if (!is_null($this->tax) && $this->tax >= 0) {
             $array['tax'] = $this->tax;
         }
 
